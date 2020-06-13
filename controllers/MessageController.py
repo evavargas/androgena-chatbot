@@ -35,17 +35,20 @@ class MessageController:
 
         self.create(message_data)
 
-        response = requests.post(
-            "https://graph.facebook.com/v2.6/me/messages",
-            params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
-            headers={"Content-Type": "application/json"},
-            data=json.dumps(
-                {
-                    "recipient": {"id": sender_id},
-                    "message": {"text": random.choice(m_lists)},
-                }
-            ),
-        )
+        if message_data["message_text"].upper() == "BUSCAR":
+            pass
+        else:
+            response = requests.post(
+                "https://graph.facebook.com/v2.6/me/messages",
+                params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                headers={"Content-Type": "application/json"},
+                data=json.dumps(
+                    {
+                        "recipient": {"id": sender_id},
+                        "message": {"text": random.choice(m_lists)},
+                    }
+                ),
+            )
 
     def create(self, data):
         sender = SenderModel.first_or_create(id_sender=data["sender_id"])
