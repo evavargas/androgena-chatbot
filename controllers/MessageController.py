@@ -10,23 +10,27 @@ load_dotenv(dotenv_path=env_path)
 
 class MessageController:
     def send_response(self, data, app):
-        m_lists = ["Mensaje automatico", "Hola ¿Como podemos ayudarte?", "¿Que tal?","Mensaje automatico II"]
+        m_lists = [
+            "Mensaje automatico",
+            "Hola ¿Como podemos ayudarte?",
+            "¿Que tal?",
+            "Mensaje automatico II",
+        ]
 
         if data["object"] == "page":
             for entry in data["entry"]:
                 for messaging_event in entry["messaging"]:
                     if messaging_event.get("message"):
                         sender_id = messaging_event["sender"]["id"]
-                        message_id = messaging_event["message"]["mid"]  
+                        message_id = messaging_event["message"]["mid"]
                         message_text = messaging_event["message"]["text"]
                         time = messaging_event["timestamp"]
-        
 
         message_data = {
-            "sender_id" : sender_id,
-            "message_id" : message_id,
-            "message_text" : message_text,
-            "time" : time   
+            "sender_id": sender_id,
+            "message_id": message_id,
+            "message_text": message_text,
+            "time": time,
         }
 
         self.create(message_data)
@@ -35,11 +39,19 @@ class MessageController:
             "https://graph.facebook.com/v2.6/me/messages",
             params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
             headers={"Content-Type": "application/json"},
-            data=json.dumps({
-        "recipient": {"id": sender_id},
-        "message": {"text": random.choice(m_lists)}
-    }))
+            data=json.dumps(
+                {
+                    "recipient": {"id": sender_id},
+                    "message": {"text": random.choice(m_lists)},
+                }
+            ),
+        )
 
-    def create(self,data):
+    def create(self, data):
         sender = SenderModel.first_or_create(id_sender=data["sender_id"])
-        message = MessageModel.create(id_sender=data["sender_id"],id_message=data["message_id"],time=data["time"],text=data["message_text"])
+        message = MessageModel.create(
+            id_sender=data["sender_id"],
+            id_message=data["message_id"],
+            time=data["time"],
+            text=data["message_text"],
+        )

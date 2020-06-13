@@ -8,7 +8,7 @@ class CreateSenderTable(Migration):
         Run the migrations.
         """
         with self.schema.create('sender') as table:
-            table.string('id_sender',20)
+            table.string('id_sender', 20)
             table.primary('id_sender')
             table.timestamps()
 
