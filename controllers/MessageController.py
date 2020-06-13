@@ -35,7 +35,7 @@ class MessageController:
 
         self.create(message_data)
 
-        if message_data["message_text"].upper() != "CONVERSAR" || 'Hola':
+        if message_data["message_text"].upper() != "CONVERSAR":
             self.music_search(message_data["message_text"])
             response = requests.post(
                 "https://graph.facebook.com/v2.6/me/messages",
