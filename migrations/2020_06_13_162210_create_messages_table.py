@@ -8,7 +8,7 @@ class CreateMessagesTable(Migration):
         Run the migrations.
         """
         with self.schema.create('messages') as table:
-            table.string('id_message',20)
+            table.string('id_message',100)
             table.primary('id_message')
             table.string('id_sender',20).unsigned()
             table.foreign('id_sender').references('id_sender').on('sender')

@@ -1,6 +1,8 @@
 import os, requests, random, json
 from dotenv import load_dotenv
 from pathlib import Path
+from models.sender import SenderModel
+from models.message import MessageModel
 
 env_path = Path(".") / ".env"
 load_dotenv(dotenv_path=env_path)
@@ -8,7 +10,7 @@ load_dotenv(dotenv_path=env_path)
 
 class MessageController:
     def send_response(self, data, app):
-        m_lists = ["Hola", "Adios", "Que tal?","Papelón"]
+        m_lists = ["Mensaje automatico", "Hola ¿Como podemos ayudarte?", "¿Que tal?","Mensaje automatico II"]
 
         if data["object"] == "page":
             for entry in data["entry"]:
@@ -29,26 +31,15 @@ class MessageController:
 
         self.create(message_data)
 
-        print(sender_id)
-
         response = requests.post(
             "https://graph.facebook.com/v2.6/me/messages",
             params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
             headers={"Content-Type": "application/json"},
-            data=json.dumps(
-                {
-                    "recipient": {"id": sender_id},
-                    "message": {"text": random.choice(m_lists)},
-                }
-            ),
-        )
-
-        data=json.dumps({
+            data=json.dumps({
         "recipient": {"id": sender_id},
         "message": {"text": random.choice(m_lists)}
     }))
 
     def create(self,data):
-       # sender = Sender.first_or_create(id_sender='John')
-       print(data)
-       #message = Messages.create(id_sender=data["sender_id"],id_message=data["sender_id"],time=data["sender_id"],text=data["message_text"])
+        sender = SenderModel.first_or_create(id_sender=data["sender_id"])
+        message = MessageModel.create(id_sender=data["sender_id"],id_message=data["message_id"],time=data["time"],text=data["message_text"])

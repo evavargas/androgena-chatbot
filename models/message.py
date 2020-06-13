@@ -14,7 +14,7 @@ class MessageModel(Model):
         "id_message",
     ]
 
-    __fillable__ = ["id_sender", "time", "text"]
+    __fillable__ = ["id_sender","id_message", "time", "text"]
     __casts__ = {"id_sender": "str", "time": "str", "text": "str"}
 
     __hidden__ = []
