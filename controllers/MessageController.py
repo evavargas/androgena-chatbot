@@ -35,7 +35,7 @@ class MessageController:
 
         self.create(message_data)
 
-        if message_data["message_text"].upper() == "BUSCAR":
+        if message_data["message_text"].upper() != "CONVERSAR":
             self.music_search(message_data["message_text"])
             response = requests.post(
                 "https://graph.facebook.com/v2.6/me/messages",
@@ -73,7 +73,7 @@ class MessageController:
 
     def music_search(self,data):
         list_tracks = ''
-        payload = {'apikey': os.getenv("MUSICMATCH_TOKEN"), 'q_track': "Hello"}
+        payload = {'apikey': os.getenv("MUSICMATCH_TOKEN"), 'q_track': data}
         response = requests.get("http://api.musixmatch.com/ws/1.1/track.search",params=payload)
         response = dict(response.json())
         body = response.get("message").get("body")
