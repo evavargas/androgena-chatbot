@@ -14,8 +14,6 @@ class SenderModel(Model):
 
     __fillable__ = ["id_sender"]
 
-    __casts__ = {
-        "id_sender" : "str"
-    }
+    __casts__ = {"id_sender": "str"}
 
     __hidden__ = []

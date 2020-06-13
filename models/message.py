@@ -10,13 +10,11 @@ class MessageModel(Model):
     __timestamps__ = True
     __connection__ = "postgres"
 
-    __guarded__ = ["id_message",]
+    __guarded__ = [
+        "id_message",
+    ]
 
     __fillable__ = ["id_sender", "time", "text"]
-    __casts__ = {
-        "id_sender" : "str",
-        "time" : "str",
-        "text" : "str"
-    }
+    __casts__ = {"id_sender": "str", "time": "str", "text": "str"}
 
     __hidden__ = []
