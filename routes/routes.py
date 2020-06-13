@@ -25,3 +25,8 @@ def routes(app):
         data = request.get_json()
         MessageController.send_response(data, app)
         return "ok"
+
+    @app.route("/search", methods=["GET"])
+    def music_search():
+        data = request.get_json()
+        return MessageController.music_search(data, app)

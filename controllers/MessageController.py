@@ -55,3 +55,9 @@ class MessageController:
             time=data["time"],
             text=data["message_text"],
         )
+
+
+    def music_search(self,data,app):
+        payload = {'apikey': os.getenv("MUSICMATCH_TOKEN"), 'q_track': 'Sine From Above'}
+        response = requests.get("http://api.musixmatch.com/ws/1.1/track.search",params=payload)
+        return response.json()
