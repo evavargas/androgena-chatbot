@@ -35,7 +35,7 @@ class MessageController:
 
         self.create(message_data)
 
-        if message_data["message_text"].upper() == "CHROMATICA":
+        if message_data["message_text"].upper() == "BUSCAR":
             self.music_search(message_data["message_text"])
             response = requests.post(
                 "https://graph.facebook.com/v2.6/me/messages",
@@ -44,7 +44,7 @@ class MessageController:
                 data=json.dumps(
                     {
                         "recipient": {"id": sender_id},
-                        "message": {"text": random.choice(m_lists)},
+                        "message": {"text": self.music_search(message_data["message_text"])},
                     }
                 ),
             )
@@ -71,9 +71,9 @@ class MessageController:
         )
 
 
-    def music_search(self,data,app):
+    def music_search(self,data):
         list_tracks = ''
-        payload = {'apikey': os.getenv("MUSICMATCH_TOKEN"), 'q_track': "CHROMATICA"}
+        payload = {'apikey': os.getenv("MUSICMATCH_TOKEN"), 'q_track': "Hello"}
         response = requests.get("http://api.musixmatch.com/ws/1.1/track.search",params=payload)
         response = dict(response.json())
         body = response.get("message").get("body")
