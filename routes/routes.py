@@ -23,10 +23,11 @@ def routes(app):
     @app.route("/", methods=["POST"])
     def handle_message():
         data = request.get_json()
+        print(data)
         MessageController.send_response(data, app)
         return "ok"
 
-    @app.route("/search", methods=["GET"])
+    """@app.route("/search", methods=["GET"])
     def music_search():
         data = request.get_json()
-        return MessageController.music_search(data, app)
+        return MessageController.music_search(data, app)"""

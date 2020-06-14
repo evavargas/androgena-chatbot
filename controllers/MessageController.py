@@ -25,6 +25,10 @@ class MessageController:
                         message_id = messaging_event["message"]["mid"]
                         message_text = messaging_event["message"]["text"]
                         time = messaging_event["timestamp"]
+                        if messaging_event["message"].get("quick_reply"):
+                            payload = messaging_event["message"].get("quick_reply").get("payload")
+                        else:
+                            payload=False
 
         message_data = {
             "sender_id": sender_id,
@@ -35,21 +39,9 @@ class MessageController:
 
         self.create(message_data)
 
-        if message_data["message_text"].upper() != "CONVERSAR":
-            self.music_search(message_data["message_text"])
-            response = requests.post(
-                "https://graph.facebook.com/v2.6/me/messages",
-                params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
-                headers={"Content-Type": "application/json"},
-                data=json.dumps(
-                    {
-                        "recipient": {"id": sender_id},
-                        "message": {"text": self.music_search(message_data["message_text"])},
-                    }
-                ),
-            )
-        else:
-            response = requests.post(
+        if payload:
+            if payload == '1':
+                response = requests.post(
                 "https://graph.facebook.com/v2.6/me/messages",
                 params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
                 headers={"Content-Type": "application/json"},
@@ -59,14 +51,50 @@ class MessageController:
                         "message": {"text": random.choice(m_lists)},
                     }
                 ),
+                )
+            else:
+                self.music_search(message_data["message_text"])
+                response = requests.post(
+                    "https://graph.facebook.com/v2.6/me/messages",
+                    params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(
+                        {
+                            "recipient": {"id": sender_id},
+                            "message": {"text": self.music_search(message_data["message_text"])},
+                        }
+                    ),
+                )
+        else:
+            response = requests.post(
+                "https://graph.facebook.com/v2.6/me/messages",
+                params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                headers={"Content-Type": "application/json"},
+                data=json.dumps(
+                    {
+                        "recipient": {"id": sender_id},
+                        "message": {"text": "¿Cómo podemos ayudarte?",
+                        "quick_replies":[
+                    {
+                        "content_type":"text",
+                        "title":"Conversar",
+                        "payload":"1"
+                    },{
+                        "content_type":"text",
+                        "title":"Buscar Música",
+                        "payload":"2"
+                    }
+                    ]},
+                    }
+                ),
             )
 
     def create(self, data):
         sender = SenderModel.first_or_create(id_sender=data["sender_id"])
-        message = MessageModel.create(
+        message = MessageModel.first_or_create(
             id_sender=data["sender_id"],
             id_message=data["message_id"],
-            time=data["time"],
+            time=f'{data["time"]}',
             text=data["message_text"],
         )
 
