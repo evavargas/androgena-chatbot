@@ -20,7 +20,10 @@ class MessageController:
         if data["object"] == "page":
             for entry in data["entry"]:
                 for messaging_event in entry["messaging"]:
-                    if messaging_event.get("message"):
+                    if messaging_event.get("postback"):
+                        sender_id = messaging_event["sender"]["id"]
+                        payload=messaging_event["postback"].get("payload")
+                    elif messaging_event.get("message"):
                         sender_id = messaging_event["sender"]["id"]
                         message_id = messaging_event["message"]["mid"]
                         message_text = messaging_event["message"]["text"]
@@ -29,31 +32,136 @@ class MessageController:
                             payload = messaging_event["message"].get("quick_reply").get("payload")
                         else:
                             payload=False
+                        message_data = {
+                            "sender_id": sender_id,
+                            "message_id": message_id,
+                            "message_text": message_text,
+                            "time": time,
+                        }
 
-        message_data = {
-            "sender_id": sender_id,
-            "message_id": message_id,
-            "message_text": message_text,
-            "time": time,
-        }
-
-        self.create(message_data)
-
-        if payload:
-            if payload == '1':
-                response = requests.post(
-                "https://graph.facebook.com/v2.6/me/messages",
-                params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
-                headers={"Content-Type": "application/json"},
-                data=json.dumps(
-                    {
-                        "recipient": {"id": sender_id},
-                        "message": {"text": random.choice(m_lists)},
-                    }
-                ),
+        if payload == '0':
+            response = requests.post(
+                    "https://graph.facebook.com/v2.6/me/messages",
+                    params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(
+                        {
+                            "recipient": {"id": sender_id},
+                            "message": {"text": "¿Cómo podemos ayudarte?",
+                            "quick_replies":[
+                        {
+                            "content_type":"text",
+                            "title":"Conversar",
+                            "payload":"1"
+                        },{
+                            "content_type":"text",
+                            "title":"Buscar Música",
+                            "payload":"2"
+                        }
+                        ]},
+                        }
+                    ),
                 )
+
+        else:
+            self.create(message_data)
+
+            if payload:
+                if payload == '1':
+                    response = requests.post(
+                    "https://graph.facebook.com/v2.6/me/messages",
+                    params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(
+                        {
+                            "recipient": {"id": sender_id},
+                            "message": {"text": random.choice(m_lists)},
+                        }
+                    ),
+                    )
+                    response = requests.post(
+                    "https://graph.facebook.com/v2.6/me/messages",
+                    params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(
+                        {
+                            "recipient": {"id": sender_id},
+                            "message": {"text": "¿Cómo podemos ayudarte?",
+                            "quick_replies":[
+                        {
+                            "content_type":"text",
+                            "title":"Conversar",
+                            "payload":"1"
+                        },{
+                            "content_type":"text",
+                            "title":"Buscar Música",
+                            "payload":"2"
+                        }
+                        ]},
+                        }
+                    ),
+                )
+                elif payload == '2':
+                    response = requests.post(
+                        "https://graph.facebook.com/v2.6/me/messages",
+                        params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                        headers={"Content-Type": "application/json"},
+                        data=json.dumps(
+                            {
+                                "recipient": {"id": sender_id},
+                                "message": {"text": "Escribe el nombre de la canción a buscar:"},
+                            }
+                        ),
+                    )
+                elif payload == '3':
+                    response = requests.post(
+                        "https://graph.facebook.com/v2.6/me/messages",
+                        params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                        headers={"Content-Type": "application/json"},
+                        data=json.dumps(
+                            {
+                                "recipient": {"id": sender_id},
+                                "message": {"text": "Escribe el nombre de la canción a buscar:"},
+                            }
+                        ),
+                    )
+                else:
+                        response = requests.post(
+                        "https://graph.facebook.com/v2.6/me/messages",
+                        params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                        headers={"Content-Type": "application/json"},
+                        data=json.dumps(
+                            {
+                                "recipient": {"id": sender_id},
+                                "message": {"text": "¿Cómo podemos ayudarte?",
+                                "quick_replies":[
+                            {
+                                "content_type":"text",
+                                "title":"Conversar",
+                                "payload":"1"
+                            },{
+                                "content_type":"text",
+                                "title":"Buscar Música",
+                                "payload":"2"
+                            }
+                            ]},
+                            }
+                        ),
+                    )
+
             else:
                 self.music_search(message_data["message_text"])
+                response = requests.post(
+                        "https://graph.facebook.com/v2.6/me/messages",
+                        params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
+                        headers={"Content-Type": "application/json"},
+                        data=json.dumps(
+                            {
+                                "recipient": {"id": sender_id},
+                                "message": {"text": self.music_search(message_data["message_text"])},
+                            }
+                        ),
+                    )
                 response = requests.post(
                     "https://graph.facebook.com/v2.6/me/messages",
                     params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
@@ -61,33 +169,21 @@ class MessageController:
                     data=json.dumps(
                         {
                             "recipient": {"id": sender_id},
-                            "message": {"text": self.music_search(message_data["message_text"])},
+                            "message": {"text": "¿Quieres buscar otra?",
+                            "quick_replies":[
+                        {
+                            "content_type":"text",
+                            "title":"Si",
+                            "payload":"3"
+                        },{
+                            "content_type":"text",
+                            "title":"No",
+                            "payload":"4"
+                        }
+                        ]},
                         }
                     ),
                 )
-        else:
-            response = requests.post(
-                "https://graph.facebook.com/v2.6/me/messages",
-                params={"access_token": os.getenv("PAGE_ACCESS_TOKEN")},
-                headers={"Content-Type": "application/json"},
-                data=json.dumps(
-                    {
-                        "recipient": {"id": sender_id},
-                        "message": {"text": "¿Cómo podemos ayudarte?",
-                        "quick_replies":[
-                    {
-                        "content_type":"text",
-                        "title":"Conversar",
-                        "payload":"1"
-                    },{
-                        "content_type":"text",
-                        "title":"Buscar Música",
-                        "payload":"2"
-                    }
-                    ]},
-                    }
-                ),
-            )
 
     def create(self, data):
         sender = SenderModel.first_or_create(id_sender=data["sender_id"])
