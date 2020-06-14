@@ -100,7 +100,7 @@ class MessageController:
 
 
     def music_search(self,data):
-        list_tracks = ''
+        list_tracks = 'Lista de canciones: \n'
         payload = {'apikey': os.getenv("MUSICMATCH_TOKEN"), 'q_track': data}
         response = requests.get("http://api.musixmatch.com/ws/1.1/track.search",params=payload)
         response = dict(response.json())
